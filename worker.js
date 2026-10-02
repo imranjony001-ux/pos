@@ -373,6 +373,17 @@ async function route(req, env) {
         const assetReq = new Request(assetUrl.toString(), req);
         const assetRes = await env.ASSETS.fetch(assetReq);
         if (assetRes.status !== 404) return assetRes;
+
+        // Final website fallback: every normal browser GET resolves to the real homepage.
+        if (!p.startsWith('/api/') && !p.startsWith('/uploads/')) {
+            const homeUrl = new URL(req.url);
+            homeUrl.pathname = '/index.html';
+            const homeRes = await env.ASSETS.fetch(new Request(homeUrl.toString(), req));
+            if (homeRes.status !== 404) return homeRes;
+        }
+    }
+    if ((req.method === 'GET' || req.method === 'HEAD') && !p.startsWith('/api/')) {
+        return new Response(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hisabi Bondhu</title></head><body><h1>Hisabi Bondhu</h1><p>Website assets are deploying. Refresh after the latest GitHub build completes.</p></body></html>`, {headers:{'content-type':'text/html; charset=utf-8'}});
     }
     return json({ success: false, error: 'Route not found' }, 404);
 }
