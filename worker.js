@@ -337,6 +337,12 @@ async function route(req, env) {
         return webLoginHandler(req, env, 'smart_tailor');
     if (p === '/family/login.php' && req.method === 'POST')
         return webLoginHandler(req, env, 'family_finance');
-    return env.ASSETS.fetch(req);
+    if (env.ASSETS && typeof env.ASSETS.fetch === 'function') {
+        return env.ASSETS.fetch(req);
+    }
+    if (p === '/' || p === '/index.html') {
+        return new Response(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hisabi Bondhu</title></head><body style="font-family:Arial,sans-serif;padding:32px"><h1>Hisabi Bondhu</h1><p>Cloudflare Worker deployed successfully.</p><p>D1/R2 bindings and full static UI can now be connected.</p></body></html>`, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+    }
+    return json({ success: false, error: 'Route not found' }, 404);
 }
 export default { fetch: route };

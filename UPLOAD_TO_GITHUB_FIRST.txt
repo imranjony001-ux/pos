@@ -1,0 +1,15 @@
+GITHUB -> CLOUDFLARE DEPLOY-SAFE STRUCTURE
+
+For the FIRST deploy, these root files are enough:
+  package.json
+  wrangler.jsonc
+  worker.js
+
+Cloudflare settings:
+  Root directory: /
+  Build command: leave empty
+  Deploy command: npx wrangler deploy
+
+This version does NOT require ./public during deploy, so the build will not fail if GitHub did not upload the public folder.
+
+After Worker deployment succeeds, upload the remaining folders (migrations, seed, public, r2_seed) and connect D1/R2 bindings.
